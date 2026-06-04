@@ -98,6 +98,10 @@ class FileStorage:
         if key in FileStorage.__objects:
             del FileStorage.__objects[key]
 
+    def rollback(self):
+        """No-op: FileStorage has no transaction to rollback."""
+        pass
+
     def close(self):
         """Call reload to deserialize the JSON file to objects."""
         self.reload()

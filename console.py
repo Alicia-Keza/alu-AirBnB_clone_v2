@@ -153,8 +153,11 @@ class HBNBCommand(cmd.Cmd):
                 except ValueError:
                     continue
 
-        new_obj.save()
-        print(new_obj.id)
+        try:
+            new_obj.save()
+            print(new_obj.id)
+        except Exception:
+            storage.rollback()
 
     def do_show(self, line):
         """Print the string representation of an instance.

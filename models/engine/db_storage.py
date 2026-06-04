@@ -124,6 +124,10 @@ class DBStorage:
         Session = scoped_session(session_factory)
         self.__session = Session()
 
+    def rollback(self):
+        """Rollback the current database session after a failed operation."""
+        self.__session.rollback()
+
     def close(self):
         """Close the current session."""
         self.__session.close()
