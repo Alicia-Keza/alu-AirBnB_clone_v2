@@ -7,9 +7,8 @@ declares the SQLAlchemy declarative Base used by DBStorage models.
 """
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime
+from sqlalchemy import Column, String, DateTime, text
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.sql import func
 
 Base = declarative_base()
 
@@ -28,9 +27,9 @@ class BaseModel:
 
     id = Column(String(60), primary_key=True, nullable=False)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow,
-                        server_default=func.now())
+                        server_default=text("CURRENT_TIMESTAMP"))
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow,
-                        server_default=func.now())
+                        server_default=text("CURRENT_TIMESTAMP"))
 
     def __init__(self, *args, **kwargs):
         """Initialize a new BaseModel instance.

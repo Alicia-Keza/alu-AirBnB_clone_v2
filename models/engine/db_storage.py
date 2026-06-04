@@ -118,11 +118,43 @@ class DBStorage:
         from models.review import Review
 
         Base.metadata.create_all(self.__engine)
+        self.__patch_datetime_defaults()
         session_factory = sessionmaker(
             bind=self.__engine, expire_on_commit=False
         )
         Session = scoped_session(session_factory)
         self.__session = Session()
+
+    def __patch_datetime_defaults(self):
+        """Add DEFAULT CURRENT_TIMESTAMP to any tables that predate server_default."""
+        from sqlalchemy import text
+        db = os.getenv("HBNB_MYSQL_DB")
+        tables = ("users", "states", "cities", "places", "amenities", "reviews")
+        with self.__engine.connect() as conn:
+            for tbl in tables:
+                try:
+                    exists = conn.execute(text(
+                        "SELECT COUNT(*) FROM information_schema.tables "
+                        "WHERE table_schema = :db AND table_name = :tbl"
+                    ), {"db": db, "tbl": tbl}).scalar()
+                    if not exists:
+                        continue
+                    has_default = conn.execute(text(
+                        "SELECT COLUMN_DEFAULT FROM information_schema.columns "
+                        "WHERE table_schema = :db AND table_name = :tbl "
+                        "AND column_name = 'created_at'"
+                    ), {"db": db, "tbl": tbl}).scalar()
+                    if has_default is None:
+                        conn.execute(text(
+                            "ALTER TABLE `{}` "
+                            "MODIFY created_at DATETIME NOT NULL "
+                            "DEFAULT CURRENT_TIMESTAMP, "
+                            "MODIFY updated_at DATETIME NOT NULL "
+                            "DEFAULT CURRENT_TIMESTAMP".format(tbl)
+                        ))
+                        conn.commit()
+                except Exception:
+                    pass
 
     def rollback(self):
         """Rollback the current database session after a failed operation."""
