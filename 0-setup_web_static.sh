@@ -22,12 +22,12 @@ cat > /data/web_static/releases/test/index.html << 'EOF'
 </html>
 EOF
 
+# Give ownership of /data folder to ubuntu user and group (recursive)
+chown -R ubuntu:ubuntu /data/
+
 # Create or recreate the symbolic link
 rm -f /data/web_static/current
 ln -s /data/web_static/releases/test /data/web_static/current
-
-# Give ownership of /data folder to ubuntu user and group (recursive)
-chown -R ubuntu:ubuntu /data/
 
 # Update Nginx configuration to serve hbnb_static
 cat > /etc/nginx/sites-available/default << 'EOF'
@@ -50,6 +50,10 @@ server {
     }
 }
 EOF
+
+# Enable the default site
+rm -f /etc/nginx/sites-enabled/default
+ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
 # Test Nginx configuration
 nginx -t
