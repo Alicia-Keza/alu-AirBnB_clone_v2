@@ -3,7 +3,7 @@
 and distributes an archive to the web servers, using the function deploy.
 """
 from datetime import datetime
-from fabric.api import env, local, put, run, sudo
+from fabric.api import env, local, put, sudo
 from os.path import exists, isdir
 
 env.hosts = ['54.152.40.73', '3.89.112.68']
