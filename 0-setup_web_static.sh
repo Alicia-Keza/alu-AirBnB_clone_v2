@@ -1,64 +1,35 @@
 #!/usr/bin/env bash
-# This script sets up a web server for the deployment of web_static
+# Sets up the web servers for the deployment of web_static
 
-# Install Nginx if not already installed
-if ! command -v nginx &> /dev/null; then
-    apt-get update
-    apt-get install -y nginx
-fi
+apt-get -y update
+apt-get -y install nginx
 
-# Create required directories
-mkdir -p /data/web_static/releases/test
-mkdir -p /data/web_static/shared
+mkdir -p /data/web_static/releases/test/
+mkdir -p /data/web_static/shared/
 
-# Create a fake HTML file for testing
-cat > /data/web_static/releases/test/index.html << 'EOF'
-<html>
-  <head>
-  </head>
-  <body>
-    Holberton School
-  </body>
-</html>
-EOF
+printf '<html>\n  <head>\n  </head>\n  <body>\n    Holberton School\n  </body>\n</html>\n' > /data/web_static/releases/test/index.html
 
-# Give ownership of /data folder to ubuntu user and group (recursive)
+rm -rf /data/web_static/current
+ln -s /data/web_static/releases/test/ /data/web_static/current
+
 chown -R ubuntu:ubuntu /data/
 
-# Create or recreate the symbolic link
-rm -f /data/web_static/current
-ln -s /data/web_static/releases/test /data/web_static/current
-
-# Update Nginx configuration to serve hbnb_static
-cat > /etc/nginx/sites-available/default << 'EOF'
-server {
+printf %s "server {
     listen 80 default_server;
     listen [::]:80 default_server;
-
+    root /var/www/html;
+    index index.html index.htm;
     server_name _;
 
     location /hbnb_static {
         alias /data/web_static/current/;
+        index index.html index.htm;
     }
 
     location / {
-        proxy_pass http://localhost:8000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        try_files \$uri \$uri/ =404;
     }
 }
-EOF
+" > /etc/nginx/sites-available/default
 
-# Enable the default site
-rm -f /etc/nginx/sites-enabled/default
-ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
-
-# Test Nginx configuration
-nginx -t
-
-# Restart Nginx
-systemctl restart nginx
-
-exit 0
+service nginx restart

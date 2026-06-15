@@ -1,42 +1,26 @@
 #!/usr/bin/python3
+"""Fabric script that generates a .tgz archive from the contents of
+the web_static folder of the AirBnB Clone repo, using the function do_pack.
 """
-Fabric script to pack the web_static directory into a compressed archive.
-"""
-from fabric.api import local
 from datetime import datetime
-import os
+from fabric.api import local
+from os.path import isdir
 
 
 def do_pack():
-    """
-    Generates a .tgz archive from the contents of the web_static folder.
-    
+    """Generates a .tgz archive from the contents of the web_static folder.
+
     Returns:
-        The archive path if successful, None otherwise.
+        str: the archive path if the archive has been correctly generated.
+        None: otherwise.
     """
     try:
-        # Create versions directory if it doesn't exist
-        if not os.path.exists("versions"):
-            os.makedirs("versions")
-        
-        # Create archive name with timestamp
-        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-        archive_name = "web_static_{}".format(timestamp)
-        archive_path = "versions/{}.tgz".format(archive_name)
-        
-        # Display the packing action
-        print("Packing web_static to {}".format(archive_path))
-        
-        # Create the archive
-        result = local("tar -cvzf {} web_static".format(archive_path), capture=True)
-        
-        # Get file size
-        file_size = os.path.getsize(archive_path)
-        
-        # Display success message
-        print("web_static packed: {} -> {}Bytes".format(archive_path, file_size))
-        
-        return archive_path
-    except Exception as e:
-        print("Error creating archive: {}".format(str(e)))
+        date = datetime.now().strftime("%Y%m%d%H%M%S")
+        if isdir("versions") is False:
+            local("mkdir versions")
+        file_name = "versions/web_static_{}.tgz".format(date)
+        print("Packing web_static to {}".format(file_name))
+        local("tar -cvzf {} web_static".format(file_name))
+        return file_name
+    except Exception:
         return None
