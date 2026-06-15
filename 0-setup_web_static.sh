@@ -1,5 +1,5 @@
-#!/bin/bash
-# This script sets up web servers for deployment of web_static
+#!/usr/bin/env bash
+# This script sets up a web server for the deployment of web_static
 
 # Install Nginx if not already installed
 if ! command -v nginx &> /dev/null; then
@@ -26,11 +26,10 @@ EOF
 rm -f /data/web_static/current
 ln -s /data/web_static/releases/test /data/web_static/current
 
-# Give ownership of /data folder to ubuntu user and group
+# Give ownership of /data folder to ubuntu user and group (recursive)
 chown -R ubuntu:ubuntu /data/
 
-# Update Nginx configuration
-# Create a new server block for hbnb_static
+# Update Nginx configuration to serve hbnb_static
 cat > /etc/nginx/sites-available/default << 'EOF'
 server {
     listen 80 default_server;
@@ -51,11 +50,6 @@ server {
     }
 }
 EOF
-
-# Enable the site if not already enabled
-if [ ! -f /etc/nginx/sites-enabled/default ]; then
-    ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
-fi
 
 # Test Nginx configuration
 nginx -t
