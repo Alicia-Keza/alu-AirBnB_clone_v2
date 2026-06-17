@@ -1,0 +1,42 @@
+/* Global reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #FAFAFA;
+    font-family: "Circular", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    overflow-x: hidden;
+}
+
+header {
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #DDDDDD;
+    height: 70px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+footer {
+    background-color: #FFFFFF;
+    border-top: 1px solid #DDDDDD;
+    bottom: 0;
+    height: 60px;
+    left: 0;
+    overflow: hidden;
+    position: fixed;
+    right: 0;
+    text-align: center;
+    line-height: 60px;
+    color: #808080;
+    font-size: 14px;
+}
